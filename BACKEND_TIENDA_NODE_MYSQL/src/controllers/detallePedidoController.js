@@ -15,7 +15,7 @@ const getDetallePedido = async (req, res) => {
     const [rows] = await connection.query(
       `SELECT dp.*, pr.nombre as producto_nombre, pr.imagen 
       FROM detalle_pedido dp 
-      INNER JOIN productos pr ON dp.id_producto = pr.id 
+      INNER JOIN producto pr ON dp.id_producto = pr.id 
       WHERE dp.id_pedido = ?`,
       [id_pedido],
     )

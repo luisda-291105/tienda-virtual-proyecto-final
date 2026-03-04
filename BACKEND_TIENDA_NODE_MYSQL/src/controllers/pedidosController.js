@@ -25,7 +25,7 @@ const getPedidos = async (req, res) => {
         const [detalles] = await connection.query(
           `SELECT dp.*, pr.nombre as producto_nombre 
           FROM detalle_pedido dp 
-          INNER JOIN productos pr ON dp.id_producto = pr.id 
+          INNER JOIN producto pr ON dp.id_producto = pr.id 
           WHERE dp.id_pedido = ?`,
           [id],
         )
@@ -81,7 +81,7 @@ const createPedido = async (req, res) => {
         )
 
         // Actualizar stock
-        await connection.query("UPDATE productos SET stock = stock - ? WHERE id = ?", [
+        await connection.query("UPDATE producto SET stock = stock - ? WHERE id = ?", [
           producto.cantidad,
           producto.id_producto,
         ])
