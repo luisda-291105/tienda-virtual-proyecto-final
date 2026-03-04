@@ -23,7 +23,7 @@ const initDatabase = async () => {
 
     // Crear todas las tablas
     await connection.query(`
-      CREATE TABLE IF NOT EXISTS productos (
+      CREATE TABLE IF NOT EXISTS producto (
         id INT PRIMARY KEY AUTO_INCREMENT,
         nombre VARCHAR(100) NOT NULL,
         descripcion VARCHAR(255),
@@ -35,7 +35,7 @@ const initDatabase = async () => {
         INDEX idx_nombre (nombre)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `)
-    console.log("✅ Tabla 'productos' creada o ya existe")
+    console.log("✅ Tabla 'producto' creada o ya existe")
 
     // Crear tabla clientes
     await connection.query(`
@@ -93,7 +93,7 @@ const initDatabase = async () => {
         precio DECIMAL(10, 2) NOT NULL,
         cantidad INT NOT NULL,
         FOREIGN KEY (id_pedido) REFERENCES pedido (id) ON DELETE CASCADE,
-        FOREIGN KEY (id_producto) REFERENCES productos (id) ON DELETE CASCADE,
+        FOREIGN KEY (id_producto) REFERENCES producto (id) ON DELETE CASCADE,
         INDEX idx_pedido (id_pedido),
         INDEX idx_producto (id_producto)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
@@ -160,10 +160,10 @@ const initDatabase = async () => {
       if (err.code !== "ER_DUP_ENTRY") throw err
     }
 
-    // Productos de ejemplo
+    // producto de ejemplo
     try {
       await connection.query(
-        "INSERT INTO productos (nombre, descripcion, precio, stock, imagen) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO producto (nombre, descripcion, precio, stock, imagen) VALUES (?, ?, ?, ?, ?)",
         [
           "Perro",
           "sin ripio y sin huevo",
@@ -178,7 +178,7 @@ const initDatabase = async () => {
 
     try {
       await connection.query(
-        "INSERT INTO productos (nombre, descripcion, precio, stock, imagen) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO producto (nombre, descripcion, precio, stock, imagen) VALUES (?, ?, ?, ?, ?)",
         [
           "Hamburguesa",
           "doble carne",
@@ -193,7 +193,7 @@ const initDatabase = async () => {
 
     try {
       await connection.query(
-        "INSERT INTO productos (nombre, descripcion, precio, stock, imagen) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO producto (nombre, descripcion, precio, stock, imagen) VALUES (?, ?, ?, ?, ?)",
         [
           "Pizza",
           "extragrande",

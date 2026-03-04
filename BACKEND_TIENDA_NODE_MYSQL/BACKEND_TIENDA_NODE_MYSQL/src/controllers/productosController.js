@@ -9,7 +9,7 @@ const getProductos = async (req, res) => {
     const connection = await pool.getConnection()
 
     if (id) {
-      const [rows] = await connection.query("SELECT * FROM productos WHERE id = ?", [id])
+      const [rows] = await connection.query("SELECT * FROM producto WHERE id = ?", [id])
       connection.release()
 
       if (rows.length > 0) {
@@ -18,7 +18,7 @@ const getProductos = async (req, res) => {
         res.status(404).json({ message: "Producto no encontrado" })
       }
     } else {
-      const [rows] = await connection.query("SELECT * FROM productos ORDER BY id DESC")
+      const [rows] = await connection.query("SELECT * FROM producto ORDER BY id DESC")
       connection.release()
       res.json(rows)
     }
@@ -39,7 +39,7 @@ const createProducto = async (req, res) => {
     const pool = getPool()
     const connection = await pool.getConnection()
     const [result] = await connection.query(
-      "INSERT INTO productos (nombre, descripcion, precio, stock, imagen) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO producto (nombre, descripcion, precio, stock, imagen) VALUES (?, ?, ?, ?, ?)",
       [nombre, descripcion || "", precio, stock, imagen || ""],
     )
     connection.release()
@@ -62,7 +62,7 @@ const updateProducto = async (req, res) => {
     const pool = getPool()
     const connection = await pool.getConnection()
     const [result] = await connection.query(
-      "UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, stock = ?, imagen = ?, updated_at = NOW() WHERE id = ?",
+      "UPDATE producto SET nombre = ?, descripcion = ?, precio = ?, stock = ?, imagen = ?, updated_at = NOW() WHERE id = ?",
       [nombre, descripcion, precio, stock, imagen, id],
     )
     connection.release()
@@ -84,7 +84,7 @@ const deleteProducto = async (req, res) => {
 
     const pool = getPool()
     const connection = await pool.getConnection()
-    const [result] = await connection.query("DELETE FROM productos WHERE id = ?", [id])
+    const [result] = await connection.query("DELETE FROM producto WHERE id = ?", [id])
     connection.release()
 
     if (result.affectedRows > 0) {
