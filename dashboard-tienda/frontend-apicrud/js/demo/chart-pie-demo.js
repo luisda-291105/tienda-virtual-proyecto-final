@@ -7,11 +7,11 @@ var ctx = document.getElementById("myPieChart");
 var myPieChart = new Chart(ctx, {
   type: 'doughnut',
   data: {
-    labels: ["Direct", "Referral", "Social"],
+    labels: [],
     datasets: [{
-      data: [55, 30, 15],
-      backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
-      hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+      data: [],
+      backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'],
+      hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#dda20a', '#be2617'],
       hoverBorderColor: "rgba(234, 236, 244, 1)",
     }],
   },
@@ -33,3 +33,23 @@ var myPieChart = new Chart(ctx, {
     cutoutPercentage: 80,
   },
 });
+
+// cargar distribución de métodos de pago
+function loadPieChartData() {
+  const root = window.API_ROOT || 'http://localhost:3000';
+  fetch(`${root}/api/pedidos`)
+    .then(r => r.json())
+    .then(pedidos => {
+      const counts = {};
+      pedidos.forEach(p => {
+        const m = p.metodo_pago || 'Desconocido';
+        counts[m] = (counts[m] || 0) + 1;
+      });
+      myPieChart.data.labels = Object.keys(counts);
+      myPieChart.data.datasets[0].data = Object.values(counts);
+      myPieChart.update();
+    })
+    .catch(err => console.error('Error cargando datos pie chart', err));
+}
+
+loadPieChartData();

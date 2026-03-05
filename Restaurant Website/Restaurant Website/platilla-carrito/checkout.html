@@ -225,5 +225,63 @@
    <a href="#" class="arrow"><i class="fa-solid fa-arrow-up"></i></a>
 
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const API = window.API_ROOT || 'http://localhost:3000';
+      const carrito = JSON.parse(localStorage.getItem('carrito')||'[]');
+      const detalle = document.getElementById('detalle-productos-checkout');
+      const totalSpan = document.getElementById('total-checkout');
+      let total = 0;
+      carrito.forEach(item => {
+        const div = document.createElement('div');
+        const subtotal = item.precio * item.cantidad;
+        total += subtotal;
+        div.textContent = `${item.nombre} x ${item.cantidad} = $${subtotal}`;
+        detalle.appendChild(div);
+      });
+      totalSpan.textContent = '$' + total.toFixed(2);
+
+      document.getElementById('form-checkout').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const cliente = {
+          nombre: document.getElementById('nombres-checkout').value,
+          apellido: document.getElementById('apellidos-checkout').value,
+          email: document.getElementById('email-checkout').value,
+          celular: document.getElementById('celular-checkout').value,
+          direccion: document.getElementById('direccion-checkout').value,
+          direccion2: document.getElementById('direccion2-checkout').value,
+          descripcion: document.getElementById('notas-checkout').value
+        };
+        fetch(`${API}/api/clientes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cliente)
+        })
+        .then(r=>r.json())
+        .then(cli => {
+          const body = {
+            id_cliente: cli.id_cliente || cli.id,
+            descuento: 0,
+            aumento: 0,
+            metodo_pago: document.querySelector('input[name="metodo-pago"]:checked').value,
+            productos: carrito.map(i=>({id_producto:i.id,precio:i.precio,cantidad:i.cantidad}))
+          };
+          return fetch(`${API}/api/pedidos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+        })
+        .then(r=>r.json())
+        .then(res => {
+          localStorage.setItem('numeroPedido', res.id);
+          localStorage.removeItem('carrito');
+          window.location.href = 'thankyou.html?pedido=' + res.id;
+        })
+        .catch(err => console.error('Error al enviar pedido', err));
+      });
+    });
+   </script>
 </body>
 </html>

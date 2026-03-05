@@ -508,5 +508,80 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const API = window.API_ROOT || 'http://localhost:3000';
+
+    function updateCartCount(){
+      const cnt = JSON.parse(localStorage.getItem('carrito')||'[]').reduce((s,i)=>s+i.cantidad,0);
+      const el = document.querySelector('.contar-pro');
+      if(el) el.textContent = cnt;
+    }
+
+    function renderCartTable(){
+      const body = document.querySelector('.list-cart tbody');
+      const carro = JSON.parse(localStorage.getItem('carrito')||'[]');
+      body.innerHTML = '';
+      carro.forEach((it,i)=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML = `<th scope="row">${i+1}</th>
+                        <td><img src="${it.imagen||''}" width="50"></td>
+                        <td>${it.nombre}</td>
+                        <td>${it.precio}</td>`;
+        body.appendChild(tr);
+      });
+    }
+
+    updateCartCount();
+    renderCartTable();
+
+    document.querySelector('.carrito').addEventListener('click',()=>{
+      const tbl = document.querySelector('.list-cart');
+      if(tbl) tbl.style.display = tbl.style.display==='none'?'table':'none';
+    });
+
+    fetch(`${API}/api/productos`)
+      .then(r=>r.json())
+      .then(products=>{
+        const cardsContainer = document.querySelector('#cards .row');
+        if(cardsContainer) cardsContainer.innerHTML = '';
+        products.forEach(p=>{
+          const col = document.createElement('div');
+          col.className = 'col-md-4 py-3 py-md-0';
+          col.innerHTML = `
+            <div class="card">
+              <img src="${p.imagen||''}" alt="" class="card-img-top">
+              <div class="card-img-overlay">
+                 <h3>${p.nombre}</h3>
+                 <p>${p.descripcion||''}</p>
+                 <button class="order-btn btn btn-primary" data-id="${p.id}" data-name="${p.nombre}" data-price="${p.precio}" data-imagen="${p.imagen||''}">Order Now</button>
+              </div>
+            </div>
+          `;
+          cardsContainer && cardsContainer.appendChild(col);
+        });
+        document.querySelectorAll('.order-btn').forEach(btn=>{
+          btn.addEventListener('click',()=>{
+            let carrito = JSON.parse(localStorage.getItem('carrito')||'[]');
+            const prod={
+              id:btn.dataset.id,
+              nombre:btn.dataset.name,
+              precio:parseFloat(btn.dataset.price)||0,
+              cantidad:1,
+              imagen:btn.dataset.imagen
+            };
+            const exist = carrito.find(i=>i.id==prod.id);
+            if(exist) exist.cantidad++;
+            else carrito.push(prod);
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+            updateCartCount();
+            renderCartTable();
+          });
+        });
+      })
+      .catch(console.error);
+  });
+  </script>
+
 </body>
 </html>
