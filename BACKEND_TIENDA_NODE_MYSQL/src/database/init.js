@@ -96,6 +96,21 @@ const initializeDatabase = async () => {
         "vendedor123",
       ])
 
+      // Productos de ejemplo (para que el dashboard no aparezca vacío)
+      const [prodCount] = await connection.query("SELECT COUNT(*) as cnt FROM productos")
+      if (prodCount[0].cnt === 0) {
+        await connection.query(
+          "INSERT INTO productos (nombre, descripcion, precio, stock, imagen) VALUES ?",
+          [
+            [
+              ["Hamburguesa", "Deliciosa hamburguesa de carne", 5.99, 50, ""],
+              ["Pizza", "Pizza 4 quesos tamaño familiar", 11.5, 30, ""],
+              ["Soda", "Refresco de cola 330ml", 1.2, 100, ""],
+            ],
+          ],
+        )
+      }
+
       // Clientes de ejemplo
       await connection.query(
         "INSERT INTO clientes (nombre, apellido, email, celular, direccion, direccion2, descripcion) VALUES (?, ?, ?, ?, ?, ?, ?)",
